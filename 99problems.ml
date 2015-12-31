@@ -1,12 +1,11 @@
 (* my solutions to 99 Problems in OCaml (https://ocaml.org/learn/tutorials/99problems.html) *)
 
 open Core.Std;;
+
 (* problem 1 *)
 let last xs =
   List.reduce xs (fun _ y -> y)
 ;;
-
-
 
 (* problem 2 *)
 let rec last_two = function
@@ -141,7 +140,6 @@ let encode = function
                   else Many (len, x))
 ;;
 
-
 (* problem 11 *)
 let rec decode = function
   | [] -> []
@@ -154,7 +152,6 @@ let rec decode = function
       else
         y :: (decode (Many (cnt-1,y) :: xs))
 ;;
-
 
 (* problem 12 *)
 let encode_direct list =
@@ -250,4 +247,26 @@ let rotate list magnitude =
       else aux xs (x::acc) (cnt+1)
   in
   aux list [] 0
+;;
+
+(* problem 19 *)
+let remove_at k list =
+  let rec aux rem cnt =
+    match rem with
+    | [] -> []
+    | x::xs ->
+      if cnt = k then xs
+      else x :: (aux xs (cnt+1))
+  in aux list 0
+;;
+
+(* problem 20 *)
+let insert_at e k list =
+  let rec aux rem cnt =
+    match rem with
+    | [] -> [e]
+    | x::xs as l ->
+      if cnt = k then e::l
+      else x :: (aux xs (cnt+1))
+  in aux list 0
 ;;
