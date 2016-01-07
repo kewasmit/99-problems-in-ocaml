@@ -1,13 +1,9 @@
-(* my solutions to 99 Problems in OCaml (https://ocaml.org/learn/tutorials/99problems.html) *)
-
 open Core.Std;;
 
-(* problem 1 *)
 let last xs =
   List.reduce xs (fun _ y -> y)
 ;;
 
-(* problem 2 *)
 let rec last_two = function
   | [] | [_] -> None
   | x::y::[] -> Some (x,y)
@@ -22,7 +18,6 @@ let last_two' = function
                         ~init:(x,y))
 ;;
 
-(* problem 3 *)
 let at loc list =
   let rec go cnt lst =
     match lst with
@@ -33,7 +28,6 @@ let at loc list =
   in go 1 list
 ;;
 
-(* problem 4 *)
 let length list =
   let rec go cnt lst =
     match lst with
@@ -50,7 +44,6 @@ let length' list =
     ~init:0
 ;;
 
-(* problem 5 *)
 let rev list =
   List.fold_left
     list
@@ -58,12 +51,10 @@ let rev list =
     ~init:[]
 ;;
 
-(* problem 6 *)
 let is_palindrome list =
   list = rev list
 ;;
 
-(* problem 7 *)
 type 'a node =
   | One of 'a
   | Many of 'a node list
@@ -85,7 +76,6 @@ let flatten' list =
   List.rev (go [] list)
 ;;
 
-(* problem 8 *)
 let rec compress = function
   | [] as l -> l
   | [_] as l -> l
@@ -105,7 +95,6 @@ let compress' list =
   List.fold_left list ~f:aux ~init:[] |> List.rev
 ;;
 
-(* problem 9 *)
 let pack list =
   let rec go acc char_acc c rem =
     match rem with
@@ -121,7 +110,6 @@ let pack list =
   | x::xs -> go [] [x] x xs |> List.rev
 ;;
 
-(* problem 10 *)
 type 'a rle =
   | One of 'a
   | Many of int * 'a
@@ -133,14 +121,13 @@ let encode = function
             (pack xs)
             ~f:(fun l ->
                 match l with
-                | [] -> raise (Invalid_argument "empty list found in encode")
+                | [] -> assert false
                 | x::xs -> (* this is the only possible pattern *)
                   let len = List.length l in
                   if len = 1 then One x
                   else Many (len, x))
 ;;
 
-(* problem 11 *)
 let rec decode = function
   | [] -> []
   | x::xs ->
@@ -153,7 +140,6 @@ let rec decode = function
         y :: (decode (Many (cnt-1,y) :: xs))
 ;;
 
-(* problem 12 *)
 let encode_direct list =
   let rec go acc item_acc c rem =
     match rem, item_acc with
@@ -173,7 +159,6 @@ let encode_direct list =
   | x::xs -> go [] (1,x) x xs |> List.map ~f:aux |> List.rev
 ;;
 
-(* problem 13 *)
 let duplicate xs =
   List.fold_left
     xs
@@ -182,7 +167,6 @@ let duplicate xs =
   |> List.rev
 ;;
 
-(* problem 14 *)
 let rec replicate l n =
   let rec aux cnt =
     match l with
@@ -194,7 +178,6 @@ let rec replicate l n =
   aux 0
 ;;
 
-(* problem 15 *)
 let drop list n =
   let rec aux l cnt =
     match l with
@@ -206,7 +189,6 @@ let drop list n =
   aux list n
 ;;
 
-(* problem 16 *)
 let rec split list n =
   let rec aux rem first cnt =
     match rem with
@@ -218,7 +200,6 @@ let rec split list n =
   aux list [] 1
 ;;
 
-(* problem 17 *)
 (* if the start is less than zero or the finish is greater than the
 list index, this will just start at the beginning or end at the end
 rather than raising an exception *)
@@ -234,7 +215,6 @@ let slice list i k =
   aux list [] 0
 ;;
 
-(* problem 18 *)
 let rotate list magnitude =
   let len = List.length list in
   let mag = magnitude mod len in
@@ -249,7 +229,6 @@ let rotate list magnitude =
   aux list [] 0
 ;;
 
-(* problem 19 *)
 let remove_at k list =
   let rec aux rem cnt =
     match rem with
@@ -260,7 +239,6 @@ let remove_at k list =
   in aux list 0
 ;;
 
-(* problem 20 *)
 let insert_at e k list =
   let rec aux rem cnt =
     match rem with
@@ -269,4 +247,52 @@ let insert_at e k list =
       if cnt = k then e::l
       else x :: (aux xs (cnt+1))
   in aux list 0
+;;
+
+let range i j =
+  let f = if j > i then (fun x -> x + 1) else (fun x -> x - 1) in
+  let rec aux cur acc =
+    if cur = j then List.rev (cur::acc)
+    else
+      let next = f cur in
+      aux next (cur::acc)
+  in
+  aux i []
+;;
+
+
+(* fails when given an empty list *)
+let rand_select list number =
+  let arr = Array.of_list list in
+  let len = Array.length arr in
+  let rec aux cnt acc =
+    if cnt = number then acc
+    else
+      let new_val = arr.(Core_kernel.Core_random.int len) in
+      aux (cnt+1) (new_val::acc)
+  in
+  aux 0 []
+;;
+
+let lotto_select number max =
+  let rec aux cnt acc =
+    if cnt = number then acc
+    else aux (cnt+1) (1 + (Core_kernel.Core_random.int max)::acc)
+  in
+  aux 0 []
+;;
+
+(* this one feels a little like cheating... *)
+let permutation = function
+  | [] | [_] as l -> l
+  | list ->
+    let arr = Array.of_list list in
+    let start = Array.length arr - 1 in
+    for i=start downto 1 do
+      let j = Random.int (i+1) in
+      let tmp = arr.(i) in
+      arr.(i) <- arr.(j);
+      arr.(j) <- tmp;
+    done;
+    Array.to_list arr
 ;;
